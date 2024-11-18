@@ -1,46 +1,43 @@
 package com.comesfullcircle.board.controller;
 
 import com.comesfullcircle.board.model.Post;
-import org.springframework.http.HttpStatus;
+import com.comesfullcircle.board.model.PostPostRequestBody;
+import com.comesfullcircle.board.service.PostService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api/v1/posts")
 public class PostController {
 
-    //전체 게시물 Read
-    @GetMapping("/api/v1/posts")
-    public ResponseEntity<List<Post>> getPosts(){
-        List<Post> posts = new ArrayList<>();
-        posts.add(new Post(1L,"Post 1", ZonedDateTime.now()));
-        posts.add(new Post(2L,"Post 2", ZonedDateTime.now()));
-        posts.add(new Post(3L,"Post 3", ZonedDateTime.now()));
+    @Autowired
+    private PostService postService;
 
-        return new ResponseEntity<>(posts, HttpStatus.OK);
+    //전체 게시물 Read
+    @GetMapping
+    public ResponseEntity<List<Post>> getPosts(){
+        List<Post> posts = postService.getPosts();
+        return ResponseEntity.ok(posts);
     }
 
     //postId 에 따른 게시물 Read
-    @GetMapping("/api/v1/posts/{postId}")
-    public ResponseEntity<Post> getPost(
+    @GetMapping("/{postId}")
+    public ResponseEntity<Post> getPostByPostId(
             @PathVariable Long postId
     ){
-        List<Post> posts = new ArrayList<>();
-        posts.add(new Post(1L,"Post 1", ZonedDateTime.now()));
-        posts.add(new Post(2L,"Post 2", ZonedDateTime.now()));
-        posts.add(new Post(3L,"Post 3", ZonedDateTime.now()));
+        Optional<Post> matchingPost = postService.getPostByPostId(postId);
+        return matchingPost.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-        Optional<Post> matchingPost =
-                posts.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
-
-        return matchingPost
-                .map(post->ResponseEntity.ok().body(post))
-                .orElse(ResponseEntity.notFound().build());
+    // 게시물 작성 Post /posts
+    @PostMapping
+    public ResponseEntity<Post> createPost(@RequestBody  PostPostRequestBody postPostRequestBody)
+    {
+       var post = postService.createPost(postPostRequestBody);
+       return ResponseEntity.ok(post);
     }
 }
