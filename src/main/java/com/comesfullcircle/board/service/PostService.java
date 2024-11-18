@@ -20,20 +20,15 @@ public class PostService {
     @Autowired
     private PostEntityRepository postEntityRepository;
 
-    private static final List<Post> posts = new ArrayList<>();
-
-    static {
-        posts.add(new Post(1L, "Post 1", ZonedDateTime.now()));
-        posts.add(new Post(2L, "Post 2", ZonedDateTime.now()));
-        posts.add(new Post(3L, "Post 3", ZonedDateTime.now()));
-    }
-
     public List<Post> getPosts() {
-        return posts;
+        var postEntities = postEntityRepository.findAll();
+        return postEntities.stream().map(Post::from).toList();
     }
 
-    public Optional<Post> getPostByPostId(Long postId) {
-        return posts.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
+    public Post getPostByPostId(Long postId) {
+        var postEntity = postEntityRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+        return Post.from(postEntity);
     }
 
     public Post createPost(PostPostRequestBody postPostRequestBody) {

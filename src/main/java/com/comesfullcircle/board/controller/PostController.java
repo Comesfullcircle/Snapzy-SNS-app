@@ -30,8 +30,8 @@ public class PostController {
     public ResponseEntity<Post> getPostByPostId(
             @PathVariable Long postId
     ){
-        Optional<Post> matchingPost = postService.getPostByPostId(postId);
-        return matchingPost.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        var post  = postService.getPostByPostId(postId);
+        return ResponseEntity.ok(post);
     }
 
     // 게시물 작성 Post /posts
