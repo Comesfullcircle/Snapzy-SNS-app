@@ -21,7 +21,7 @@ spring:
   loging:
     level:
       # TRACE < DEBUF < INDO < WARN < ERROR
-      root: ERROR
+      root: INFO
 
       #  logging:
       #    level:

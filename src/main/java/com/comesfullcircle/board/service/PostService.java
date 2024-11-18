@@ -1,6 +1,7 @@
 package com.comesfullcircle.board.service;
 
 import com.comesfullcircle.board.controller.PostController;
+import com.comesfullcircle.board.exception.post.PostNotFoundException;
 import com.comesfullcircle.board.model.Post;
 import com.comesfullcircle.board.model.PostPatchRequestBody;
 import com.comesfullcircle.board.model.PostPostRequestBody;
@@ -29,7 +30,7 @@ public class PostService {
 
     public Post getPostByPostId(Long postId) {
         var postEntity = postEntityRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+                .orElseThrow(() -> new PostNotFoundException(postId));
         return Post.from(postEntity);
     }
 
@@ -42,7 +43,7 @@ public class PostService {
 
     public Post updatePost(Long postId, PostPatchRequestBody postPatchRequestBody) {
         var postEntity = postEntityRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+                .orElseThrow(() -> new PostNotFoundException(postId));
         postEntity.setBody(postPatchRequestBody.body());
         var updatedPostEntity = postEntityRepository.save(postEntity);
         return Post.from(updatedPostEntity);
