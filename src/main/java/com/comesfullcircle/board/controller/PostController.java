@@ -1,6 +1,7 @@
 package com.comesfullcircle.board.controller;
 
 import com.comesfullcircle.board.model.Post;
+import com.comesfullcircle.board.model.PostPatchRequestBody;
 import com.comesfullcircle.board.model.PostPostRequestBody;
 import com.comesfullcircle.board.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class PostController {
     //전체 게시물 Read
     @GetMapping
     public ResponseEntity<List<Post>> getPosts(){
-        List<Post> posts = postService.getPosts();
+        var posts = postService.getPosts();
         return ResponseEntity.ok(posts);
     }
 
@@ -39,5 +40,16 @@ public class PostController {
     {
        var post = postService.createPost(postPostRequestBody);
        return ResponseEntity.ok(post);
+    }
+
+
+    //update 수정하기
+    @PatchMapping("/{postId}")
+    public ResponseEntity<Post> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostPatchRequestBody postPatchRequestBody
+    ){
+        var post = postService.updatePost(postId, postPatchRequestBody);
+        return ResponseEntity.ok(post);
     }
 }

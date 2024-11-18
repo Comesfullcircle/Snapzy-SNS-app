@@ -3,6 +3,9 @@ package com.comesfullcircle.board.model;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
+//public record Post(Long postId, String body, ZonedDateTime createDateTime){}
+
+
 public class Post {
     private Long postId;
     private String body;
