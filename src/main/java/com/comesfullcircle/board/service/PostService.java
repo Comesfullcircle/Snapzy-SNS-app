@@ -1,22 +1,23 @@
 package com.comesfullcircle.board.service;
 
+import com.comesfullcircle.board.controller.PostController;
 import com.comesfullcircle.board.model.Post;
 import com.comesfullcircle.board.model.PostPatchRequestBody;
 import com.comesfullcircle.board.model.PostPostRequestBody;
 import com.comesfullcircle.board.model.entity.PostEntity;
 import com.comesfullcircle.board.repository.PostEntityRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostService {
+
 
     @Autowired
     private PostEntityRepository postEntityRepository;

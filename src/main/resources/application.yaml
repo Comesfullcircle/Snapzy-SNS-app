@@ -18,6 +18,11 @@ spring:
     user:
       name: board-admin
       password: 1234
+  loging:
+    level:
+      # TRACE < DEBUF < INDO < WARN < ERROR
+      root: ERROR
+
       #  logging:
       #    level:
       #      org.hibernate.type: TRACE
