@@ -14,10 +14,14 @@ spring:
     url: jdbc:postgresql://localhost:5432/board_db
     username: board-master
     password: 1234
-  logging:
-    level:
-      org.hibernate.type: TRACE
-      org.hibernate.orm.jdbc.bind: TRACE
-      org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG
-      org.springframework.orm.jpa: DEBUG
-      org.springframework.transaction: DEBUG
+  security:
+    user:
+      name: board-admin
+      password: 1234
+      #  logging:
+      #    level:
+      #      org.hibernate.type: TRACE
+      #      org.hibernate.orm.jdbc.bind: TRACE
+      #      org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG
+      #      org.springframework.orm.jpa: DEBUG
+#      org.springframework.transaction: DEBUG
