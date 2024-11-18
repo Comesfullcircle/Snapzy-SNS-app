@@ -3,6 +3,7 @@ package com.comesfullcircle.board.service;
 import com.comesfullcircle.board.model.Post;
 import com.comesfullcircle.board.model.PostPatchRequestBody;
 import com.comesfullcircle.board.model.PostPostRequestBody;
+import com.comesfullcircle.board.model.entity.PostEntity;
 import com.comesfullcircle.board.repository.PostEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,12 +33,10 @@ public class PostService {
     }
 
     public Post createPost(PostPostRequestBody postPostRequestBody) {
-        var newPostId = posts.stream().mapToLong(Post::getPostId).max().orElse(0L)+1;
-
-        var newPost = new Post(newPostId, postPostRequestBody.body(), ZonedDateTime.now());
-        posts.add(newPost);
-
-        return newPost;
+        var postEntity = new PostEntity();
+        postEntity.setBody(postPostRequestBody.body());
+        var savedPostEntity = postEntityRepository.save(postEntity);
+        return Post.from(savedPostEntity);
     }
 
     public Post updatePost(Long postId, PostPatchRequestBody postPatchRequestBody) {

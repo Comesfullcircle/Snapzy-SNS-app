@@ -84,4 +84,15 @@ public class PostEntity {
     public int hashCode() {
         return Objects.hash(postId, body, createdDateTime, updatedDateTime, deletedDateTime);
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdDateTime = ZonedDateTime.now();
+        this.updatedDateTime = this.createdDateTime;
+    }
+
+    @PreUpdate
+    private  void preUpdate() {
+        this.updatedDateTime = ZonedDateTime.now();
+    }
 }
