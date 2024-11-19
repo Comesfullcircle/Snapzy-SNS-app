@@ -163,7 +163,7 @@ public class UserEntity implements UserDetails {
         //Avatar Placeholder 서비스(https://avatar-placeholder.iran.liara.run)기반
         // 랜덤한 프로필 사진 설정(1~100)
        // userEntity.setProfile("https://avatar.iran.liara.run/public"+ new Random().nextInt(100)+ ".png");
-        userEntity.setProfile("https://avatar.iran.liara.run/public"+ new Random().nextInt(100));
+        userEntity.setProfile("https://avatar.iran.liara.run/public"+ (new Random().nextInt(100)+1));
 
         return userEntity;
     }
