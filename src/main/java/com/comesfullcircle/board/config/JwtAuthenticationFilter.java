@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // TODO : JWT 검증
 
-        String BEARER_PREFIX = "Bearer ";
+        String BEARER_PREFIX = "Bearer";
         var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         var securityContext = SecurityContextHolder.getContext();
 

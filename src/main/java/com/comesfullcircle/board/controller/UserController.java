@@ -1,6 +1,8 @@
 package com.comesfullcircle.board.controller;
 
 import com.comesfullcircle.board.model.user.User;
+import com.comesfullcircle.board.model.user.UserAuthenticationResponse;
+import com.comesfullcircle.board.model.user.UserLoginRequestBody;
 import com.comesfullcircle.board.model.user.UserSignUpRequestBody;
 import com.comesfullcircle.board.service.UserService;
 import jakarta.validation.Valid;
@@ -27,5 +29,14 @@ public class UserController {
         );
        return ResponseEntity.ok(user);
    //     return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<UserAuthenticationResponse> authenticate(@Valid @RequestBody UserLoginRequestBody userLoginRequestBody){
+        var response = userService.authenticate(
+                userLoginRequestBody.username(),
+                userLoginRequestBody.password()
+        );
+        return ResponseEntity.ok(response);
     }
 }
