@@ -3,6 +3,7 @@ package com.comesfullcircle.board.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -42,7 +43,8 @@ public class WebConfiguration {
         http
                 .cors(Customizer.withDefaults()) // CORS 설정 활성화
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/v1/public/**").permitAll() // 인증 없이 허용
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/*/users/**").permitAll() // 인증 없이 허용
                         .anyRequest().authenticated()) // 나머지는 인증 필요
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
