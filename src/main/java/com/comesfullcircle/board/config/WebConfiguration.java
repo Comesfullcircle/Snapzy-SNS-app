@@ -44,7 +44,7 @@ public class WebConfiguration {
                 .cors(Customizer.withDefaults()) // CORS 설정 활성화
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST,
-                                "/api/*/users/**").permitAll() // 인증 없이 허용
+                                "/api/*/users/**", "/api/*/users/authenticate").permitAll() // 인증 없이 허용
                         .anyRequest().authenticated()) // 나머지는 인증 필요
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화

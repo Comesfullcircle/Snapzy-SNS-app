@@ -19,11 +19,10 @@ import java.util.jar.JarException;
 public class JwtExceptionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try{
+        try {
             filterChain.doFilter(request, response);
-        }
-        catch (JarException exception) {
-            //TODO : JWT 관련 커스텀 에러메시지 생성해 RESPONSE 로 내려주기
+        } catch (JarException exception) {
+            // JWT 관련 커스텀 에러 메시지 생성 및 응답 설정
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setCharacterEncoding("UTF-8");
@@ -35,8 +34,9 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             ObjectMapper objectMapper = new ObjectMapper();
             String responseJson = objectMapper.writeValueAsString(errorMap);
             response.getWriter().print(responseJson);
-        }
 
-        filterChain.doFilter(request, response);
+            // 응답이 이미 작성되었으므로 이후 필터 체인을 호출하지 않음
+            return;
+        }
     }
 }
