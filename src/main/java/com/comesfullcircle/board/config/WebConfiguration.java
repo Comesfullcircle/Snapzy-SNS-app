@@ -1,5 +1,6 @@
 package com.comesfullcircle.board.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -8,6 +9,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -17,6 +19,9 @@ import java.util.List;
 
 @Configuration
 public class WebConfiguration {
+
+    @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired private JwtExceptionFilter jwtExceptionFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -41,6 +46,8 @@ public class WebConfiguration {
                         .anyRequest().authenticated()) // 나머지는 인증 필요
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtExceptionFilter, jwtAuthenticationFilter.getClass())
                 .httpBasic(Customizer.withDefaults()); // HTTP Basic 인증
 
         return http.build();
