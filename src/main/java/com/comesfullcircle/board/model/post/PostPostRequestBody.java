@@ -1,6 +1,4 @@
-package com.comesfullcircle.board.model;
-
-import java.util.Objects;
+package com.comesfullcircle.board.model.post;
 
 public record PostPostRequestBody(String body){
 

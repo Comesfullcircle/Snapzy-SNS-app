@@ -1,4 +1,4 @@
-package com.comesfullcircle.board.model;
+package com.comesfullcircle.board.model.post;
 
 import com.comesfullcircle.board.model.entity.PostEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
