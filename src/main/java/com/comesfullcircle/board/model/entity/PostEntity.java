@@ -10,7 +10,9 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "post")
+@Table(
+        name = "post",
+        indexes = {@Index(name = "post_userid_idx", columnList = "userId")})
 @SQLDelete(sql = "UPDATE \"post\" SET deleteddatetime = CURRENT_TIMESTAMP WHERE postid = ?")
 //Deperecated in Hibernate 6.3
 //@Where(clause = "deletedDateTime IS NULL")
@@ -31,6 +33,10 @@ public class PostEntity {
 
     @Column
     private ZonedDateTime deletedDateTime;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private UserEntity user;
 
     public Long getPostId() {
         return postId;
@@ -68,6 +74,14 @@ public class PostEntity {
         return deletedDateTime;
     }
 
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
     public void setDeletedDateTime(ZonedDateTime deletedDateTime) {
         this.deletedDateTime = deletedDateTime;
     }
@@ -77,12 +91,12 @@ public class PostEntity {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         PostEntity that = (PostEntity) object;
-        return Objects.equals(postId, that.postId) && Objects.equals(body, that.body) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime);
+        return Objects.equals(postId, that.postId) && Objects.equals(body, that.body) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime) && Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(postId, body, createdDateTime, updatedDateTime, deletedDateTime);
+        return Objects.hash(postId, body, createdDateTime, updatedDateTime, deletedDateTime, user);
     }
 
     @PrePersist
