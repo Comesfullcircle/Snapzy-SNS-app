@@ -2,8 +2,8 @@ package com.comesfullcircle.board.exception.jwt;
 
 import io.jsonwebtoken.JwtException;
 
-public class JwtTokentNotFoundException extends JwtException {
-    public JwtTokentNotFoundException() {
+public class JwtTokenNotFoundException extends JwtException {
+    public JwtTokenNotFoundException() {
         super("JWT token not found");
     }
 }
