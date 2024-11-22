@@ -1,6 +1,7 @@
 package com.comesfullcircle.board.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,26 +18,29 @@ import java.util.jar.JarException;
 
 @Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        try{
             filterChain.doFilter(request, response);
-        } catch (JarException exception) {
-            // JWT 관련 커스텀 에러 메시지 생성 및 응답 설정
+        }catch (JwtException exception){
+            //  jwt 관련 커스텀 에러 메세지 생성
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setCharacterEncoding("UTF-8");
 
+            // JSON으로 응답할 오류 메시지
             var errorMap = new HashMap<String, Object>();
             errorMap.put("status", HttpStatus.UNAUTHORIZED);
             errorMap.put("message", exception.getMessage());
 
+            // ObjectMapper를 사용해 Map을 JSON 형식으로 변환
             ObjectMapper objectMapper = new ObjectMapper();
             String responseJson = objectMapper.writeValueAsString(errorMap);
-            response.getWriter().print(responseJson);
+            response.getWriter().write(responseJson);
 
-            // 응답이 이미 작성되었으므로 이후 필터 체인을 호출하지 않음
-            return;
         }
+
     }
 }
