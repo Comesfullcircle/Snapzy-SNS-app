@@ -2,12 +2,14 @@ package com.comesfullcircle.board.service;
 
 import com.comesfullcircle.board.exception.post.PostNotFoundException;
 import com.comesfullcircle.board.exception.user.UserNotAllowedException;
+import com.comesfullcircle.board.exception.user.UserNotFoundException;
 import com.comesfullcircle.board.model.entity.UserEntity;
 import com.comesfullcircle.board.model.post.Post;
 import com.comesfullcircle.board.model.post.PostPatchRequestBody;
 import com.comesfullcircle.board.model.post.PostPostRequestBody;
 import com.comesfullcircle.board.model.entity.PostEntity;
 import com.comesfullcircle.board.repository.PostEntityRepository;
+import com.comesfullcircle.board.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class PostService {
 
     @Autowired
     private PostEntityRepository postEntityRepository;
+    @Autowired
+    private UserEntityRepository userEntityRepository;
 
     public List<Post> getPosts() {
         var postEntities = postEntityRepository.findAll();
@@ -62,5 +66,15 @@ public class PostService {
         }
 
         postEntityRepository.delete(postEntity);
+    }
+
+    public List<Post> getPostsByUsername(String username) {
+        var userEntity =
+                userEntityRepository
+                        .findByUsername(username)
+                        .orElseThrow(() -> new UserNotFoundException(username));
+
+        var postEntities = postEntityRepository.findByUser(userEntity);
+        return postEntities.stream().map(Post::from).toList();
     }
 }

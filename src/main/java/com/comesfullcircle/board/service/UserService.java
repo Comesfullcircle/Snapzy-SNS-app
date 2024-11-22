@@ -1,10 +1,12 @@
 package com.comesfullcircle.board.service;
 
 import com.comesfullcircle.board.exception.user.UserAlreadyExistException;
+import com.comesfullcircle.board.exception.user.UserNotAllowedException;
 import com.comesfullcircle.board.exception.user.UserNotFoundException;
 import com.comesfullcircle.board.model.entity.UserEntity;
 import com.comesfullcircle.board.model.user.User;
 import com.comesfullcircle.board.model.user.UserAuthenticationResponse;
+import com.comesfullcircle.board.model.user.UserPatchRequestBody;
 import com.comesfullcircle.board.repository.UserEntityRepository;
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.annotations.SQLDelete;
@@ -15,6 +17,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -55,5 +59,45 @@ public class UserService implements UserDetailsService {
         }else{
             throw new UserNotFoundException();
         }
+    }
+
+    public List<User> getUsers(String query){
+        List<UserEntity> userEntities;
+
+        if(query != null && !query.isBlank()){
+            // query 검색어 기반, 해당 검색어가 username에 포함되어 있는 유저목록 가져오기
+            userEntities = userEntityRepository.findByUsernameContaining(query);
+        }else{
+            userEntities = userEntityRepository.findAll();
+        }
+
+        return userEntities.stream().map(User::from).toList();
+    }
+
+    public User getUser(String username) {
+        var userEntity =
+                userEntityRepository.findByUsername(username)
+                        .orElseThrow(()-> new UsernameNotFoundException("User not found: " + username));
+
+        return User.from(userEntity);
+    }
+
+    public User updateUser(
+            String username, UserPatchRequestBody userPatchRequestBody, UserEntity currentUser) {
+        var userEntity =
+                userEntityRepository
+                        .findByUsername(username)
+                        .orElseThrow(()-> new UsernameNotFoundException(username));
+
+        if (!userEntity.equals(currentUser)) {
+            throw new UserNotAllowedException();
+        }
+
+        if (userPatchRequestBody.description() != null) {
+            userEntity.setDescrption(userPatchRequestBody.description());
+        }
+
+        return User.from(userEntityRepository.save(userEntity));
+
     }
 }
