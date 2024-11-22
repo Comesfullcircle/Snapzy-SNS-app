@@ -1,5 +1,6 @@
 package com.comesfullcircle.board.model.entity;
 
+import com.comesfullcircle.board.model.post.Post;
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
@@ -97,6 +98,13 @@ public class PostEntity {
     @Override
     public int hashCode() {
         return Objects.hash(postId, body, createdDateTime, updatedDateTime, deletedDateTime, user);
+    }
+
+    public static PostEntity of(String body, UserEntity user) {
+        var post = new PostEntity();
+        post.setBody(body);
+        post.setUser(user);
+        return post;
     }
 
     @PrePersist
