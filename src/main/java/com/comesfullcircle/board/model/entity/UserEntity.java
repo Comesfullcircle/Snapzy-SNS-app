@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.ZonedDateTime;
@@ -66,6 +67,11 @@ public class UserEntity implements UserDetails {
         return Objects.hash(userId, username, password, profile, descrption, follwersCount, follwingsCount, createdDateTime, updatedDateTime, deletedDateTime);
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // 사용자의 기본 권한 ROLE_USER를 반환
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
     public Long getUserId() {
         return userId;
     }

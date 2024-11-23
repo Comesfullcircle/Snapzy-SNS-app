@@ -161,4 +161,33 @@ public class UserService implements UserDetailsService {
 
         return User.from(following);
     }
+
+    public List<User> getFollowersByUsername(String username) {
+        // username으로 사용자를 찾습니다.
+        var userEntity = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        // 해당 사용자를 following으로 설정한 FollowEntity 리스트를 가져옵니다.
+        var followEntities = followEntityRepository.findByFollowing(userEntity);
+
+        // FollowEntity 리스트를 기반으로 follower를 User 객체로 변환하여 반환합니다.
+        return followEntities.stream()
+                .map(followEntity -> User.from(followEntity.getFollower()))
+                .toList();
+    }
+
+    public List<User> getFollowingsByUsername(String username) {
+        // username으로 사용자를 찾습니다.
+        var userEntity = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        // 해당 사용자를 follower로 설정한 FollowEntity 리스트를 가져옵니다.
+        var followEntities = followEntityRepository.findByFollower(userEntity);
+
+        // FollowEntity 리스트를 기반으로 following을 User 객체로 변환하여 반환합니다.
+        return followEntities.stream()
+                .map(followEntity -> User.from(followEntity.getFollowing()))
+                .toList();
+    }
+
 }

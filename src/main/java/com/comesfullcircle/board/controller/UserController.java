@@ -53,14 +53,26 @@ public class UserController {
     }
 
 
-    @PostMapping("/{username}/follows")
-    public ResponseEntity<User> follow(@PathVariable String username, Authentication authentication){
+    @GetMapping("/{username}/followers")
+    public ResponseEntity<List<User>> getFollowersByUser(@PathVariable String username, Authentication authentication){
+        var followers = userService.getFollowersByUsername(username);
+        return ResponseEntity.ok(followers);
+    }
+
+    @GetMapping("/{username}/followings")
+    public ResponseEntity<List<User>> getFollowingsByUser(@PathVariable String username, Authentication authentication) {
+        var followings = userService.getFollowingsByUsername(username);
+        return ResponseEntity.ok(followings);
+    }
+
+    @DeleteMapping("/{username}/unfollows")
+    public ResponseEntity<User> unfollow(@PathVariable String username, Authentication authentication){
         var user = userService.follow(username, (UserEntity) authentication.getPrincipal());
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("/{username}/follows")
-    public ResponseEntity<User> unfollow(@PathVariable String username, Authentication authentication){
+    @PostMapping("/{username}/follows")
+    public ResponseEntity<User> follow(@PathVariable String username, Authentication authentication){
         var user = userService.follow(username, (UserEntity) authentication.getPrincipal());
         return ResponseEntity.ok(user);
     }
