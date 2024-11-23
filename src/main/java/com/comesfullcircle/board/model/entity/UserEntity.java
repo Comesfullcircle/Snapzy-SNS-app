@@ -39,6 +39,12 @@ public class UserEntity implements UserDetails {
     private String descrption;
 
     @Column
+    private Long follwersCount = 0L;
+
+    @Column
+    private Long follwingsCount = 0L;
+
+    @Column
     private ZonedDateTime createdDateTime;
 
     @Column
@@ -52,12 +58,12 @@ public class UserEntity implements UserDetails {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         UserEntity that = (UserEntity) object;
-        return Objects.equals(userId, that.userId) && Objects.equals(username, that.username) && Objects.equals(password, that.password) && Objects.equals(profile, that.profile) && Objects.equals(descrption, that.descrption) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime);
+        return Objects.equals(userId, that.userId) && Objects.equals(username, that.username) && Objects.equals(password, that.password) && Objects.equals(profile, that.profile) && Objects.equals(descrption, that.descrption) && Objects.equals(follwersCount, that.follwersCount) && Objects.equals(follwingsCount, that.follwingsCount) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, username, password, profile, descrption, createdDateTime, updatedDateTime, deletedDateTime);
+        return Objects.hash(userId, username, password, profile, descrption, follwersCount, follwingsCount, createdDateTime, updatedDateTime, deletedDateTime);
     }
 
     public Long getUserId() {
@@ -68,8 +74,18 @@ public class UserEntity implements UserDetails {
         this.userId = userId;
     }
 
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password) {
@@ -92,12 +108,20 @@ public class UserEntity implements UserDetails {
         this.descrption = descrption;
     }
 
-    public ZonedDateTime getUpdatedDateTime() {
-        return updatedDateTime;
+    public Long getFollwersCount() {
+        return follwersCount;
     }
 
-    public void setUpdatedDateTime(ZonedDateTime updatedDateTime) {
-        this.updatedDateTime = updatedDateTime;
+    public void setFollwersCount(Long follwersCount) {
+        this.follwersCount = follwersCount;
+    }
+
+    public Long getFollwingsCount() {
+        return follwingsCount;
+    }
+
+    public void setFollwingsCount(Long follwingsCount) {
+        this.follwingsCount = follwingsCount;
     }
 
     public ZonedDateTime getCreatedDateTime() {
@@ -116,20 +140,12 @@ public class UserEntity implements UserDetails {
         this.deletedDateTime = deletedDateTime;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        //return List.of();
-        return null;
+    public ZonedDateTime getUpdatedDateTime() {
+        return updatedDateTime;
     }
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
+    public void setUpdatedDateTime(ZonedDateTime updatedDateTime) {
+        this.updatedDateTime = updatedDateTime;
     }
 
     @Override

@@ -28,6 +28,8 @@ public class PostEntity {
 
     @Column private Long repliesCount = 0L;
 
+    @Column private Long likesCount = 0L;
+
     @Column
     private ZonedDateTime createdDateTime;
 
@@ -49,6 +51,14 @@ public class PostEntity {
         this.postId = postId;
     }
 
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public Long getRepliesCount() {
         return repliesCount;
     }
@@ -57,12 +67,12 @@ public class PostEntity {
         this.repliesCount = repliesCount;
     }
 
-    public String getBody() {
-        return body;
+    public Long getLikesCount() {
+        return likesCount;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setLikesCount(Long likesCount) {
+        this.likesCount = likesCount;
     }
 
     public ZonedDateTime getCreatedDateTime() {
@@ -103,12 +113,12 @@ public class PostEntity {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         PostEntity that = (PostEntity) object;
-        return Objects.equals(postId, that.postId) && Objects.equals(body, that.body) && Objects.equals(repliesCount, that.repliesCount) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime) && Objects.equals(user, that.user);
+        return Objects.equals(postId, that.postId) && Objects.equals(body, that.body) && Objects.equals(repliesCount, that.repliesCount) && Objects.equals(likesCount, that.likesCount) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime) && Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(postId, body, repliesCount, createdDateTime, updatedDateTime, deletedDateTime, user);
+        return Objects.hash(postId, body, repliesCount, likesCount, createdDateTime, updatedDateTime, deletedDateTime, user);
     }
 
     public static PostEntity of(String body, UserEntity user) {
