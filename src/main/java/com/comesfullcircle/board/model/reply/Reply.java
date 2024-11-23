@@ -24,9 +24,9 @@ public record Reply(
                 replyEntity.getBody(),
                 User.from(replyEntity.getUser()),
                 Post.from(replyEntity.getPost()),
-                replyEntity.getCreatedDateTime(),
-                replyEntity.getUpdatedDateTime(),
-                replyEntity.getDeletedDateTime()
+                replyEntity.getCreateDateTime(),
+                replyEntity.getUpdateDateTime(),
+                replyEntity.getDeleteDateTime()
         );
     }
 
