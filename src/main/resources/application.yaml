@@ -10,7 +10,7 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://localhost:5432/board-db
+    url: jdbc:postgresql://localhost:5432/board_db
     username: board-master
     password: 1234
   security:

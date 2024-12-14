@@ -50,10 +50,12 @@ public class WebConfiguration {
                                         .authenticated())
                 .sessionManagement(
                         (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(CsrfConfigurer::disable)
+                //.csrf(CsrfConfigurer::disable)
+                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, jwtAuthenticationFilter.getClass())
-                .httpBasic(HttpBasicConfigurer::disable);
+                //.httpBasic(HttpBasicConfigurer::disable);
+                .httpBasic(httpBasic -> httpBasic.disable()); // HTTP Basic 인증 비활성화
 
         return http.build();
     }
