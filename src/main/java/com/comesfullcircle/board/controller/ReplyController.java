@@ -19,52 +19,44 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/api/v1/post/{postId}/replies")
 @RestController
+@RequestMapping("/api/v1/posts/{postId}")
 public class ReplyController {
+    @Autowired private ReplyService replyService;
 
-    private static final Logger logger = LoggerFactory.getLogger(ReplyController.class);
-
-    @Autowired
-    private PostService postService;
-
-    @Autowired
-    private ReplyService replyService;
-
-    @GetMapping
+    @GetMapping("/replies")
     public ResponseEntity<List<Reply>> getRepliesByPostId(@PathVariable Long postId) {
-        logger.info("GET /api/v1/posts");
         var replies = replyService.getRepliesByPostId(postId);
         return ResponseEntity.ok(replies);
     }
 
-    @PostMapping
+    @PostMapping("/replies")
     public ResponseEntity<Reply> createReply(
             @PathVariable Long postId,
-            @RequestBody ReplyPostRequestBody replyPostRequestBody , Authentication authentication) {
-        var reply = replyService.createReply(postId, replyPostRequestBody,(UserEntity)authentication.getPrincipal());
+            @RequestBody ReplyPostRequestBody replyPostRequestBody,
+            Authentication authentication) {
+        var reply =
+                replyService.createReply(
+                        postId, replyPostRequestBody, (UserEntity) authentication.getPrincipal());
         return ResponseEntity.ok(reply);
     }
 
-    @PatchMapping("/{replyId}")
-    public ResponseEntity<Reply> updateReply(
+    @PatchMapping("/replies/{replyId}")
+    public ResponseEntity<Reply> updatePost(
             @PathVariable Long postId,
             @PathVariable Long replyId,
             @RequestBody ReplyPatchRequestBody replyPatchRequestBody,
-            Authentication authentication
-    ) {
-
-        var reply = replyService.updateReply(postId, replyId, replyPatchRequestBody, (UserEntity)authentication.getPrincipal());
+            Authentication authentication) {
+        var reply =
+                replyService.updateReply(
+                        postId, replyId, replyPatchRequestBody, (UserEntity) authentication.getPrincipal());
         return ResponseEntity.ok(reply);
     }
 
-
-    @DeleteMapping ("/{replyId}")
+    @DeleteMapping("/replies/{replyId}")
     public ResponseEntity<Void> deleteReply(
-            @PathVariable Long postId,
-            @PathVariable Long replyId,
-            Authentication authentication ) {
-        replyService.deleteReply(postId, replyId, (UserEntity)authentication.getPrincipal());
+            @PathVariable Long postId, @PathVariable Long replyId, Authentication authentication) {
+        replyService.deleteReply(postId, replyId, (UserEntity) authentication.getPrincipal());
         return ResponseEntity.noContent().build();
     }
 }

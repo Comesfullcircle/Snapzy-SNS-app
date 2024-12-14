@@ -10,22 +10,25 @@ import java.util.Objects;
 @Entity
 @Table(
         name = "reply",
-        indexes = {@Index(name = "reply_userid_idx", columnList ="userid" ),
-                @Index(name = "reply_postid_idx", columnList ="postid" )})
-@SQLDelete(sql="UPDATE \"reply\" SET deletedatetime = CURRENT_TIMESTAMP WHERE replyid = ?" )
-@SQLRestriction("deletedatetime IS NULL")
+        indexes = {
+                @Index(name = "reply_userid_idx", columnList = "userid"),
+                @Index(name = "reply_postid_idx", columnList = "postid")
+        })
+@SQLDelete(sql = "UPDATE reply SET deleteddatetime = CURRENT_TIMESTAMP WHERE replyid = ?")
+@SQLRestriction("deleteddatetime IS NULL")
 public class ReplyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long replyId;
+
     @Column(columnDefinition = "TEXT")
     private String body;
-    @Column
-    private ZonedDateTime createDateTime;
-    @Column
-    private ZonedDateTime updateDateTime;
-    @Column
-    private ZonedDateTime deleteDateTime;
+
+    @Column private ZonedDateTime createdDateTime;
+
+    @Column private ZonedDateTime updatedDateTime;
+
+    @Column private ZonedDateTime deletedDateTime;
 
     @ManyToOne
     @JoinColumn(name = "userid")
@@ -35,6 +38,15 @@ public class ReplyEntity {
     @JoinColumn(name = "postid")
     private PostEntity post;
 
+    public ReplyEntity() {}
+
+    public static ReplyEntity of(String body, UserEntity user, PostEntity post) {
+        ReplyEntity reply = new ReplyEntity();
+        reply.setBody(body);
+        reply.setUser(user);
+        reply.setPost(post);
+        return reply;
+    }
 
     public Long getReplyId() {
         return replyId;
@@ -52,28 +64,28 @@ public class ReplyEntity {
         this.body = body;
     }
 
-    public ZonedDateTime getCreateDateTime() {
-        return createDateTime;
+    public ZonedDateTime getCreatedDateTime() {
+        return createdDateTime;
     }
 
-    public void setCreateDateTime(ZonedDateTime createDateTime) {
-        this.createDateTime = createDateTime;
+    public void setCreatedDateTime(ZonedDateTime createdDateTime) {
+        this.createdDateTime = createdDateTime;
     }
 
-    public ZonedDateTime getUpdateDateTime() {
-        return updateDateTime;
+    public ZonedDateTime getUpdatedDateTime() {
+        return updatedDateTime;
     }
 
-    public void setUpdateDateTime(ZonedDateTime updateDateTime) {
-        this.updateDateTime = updateDateTime;
+    public void setUpdatedDateTime(ZonedDateTime updatedDateTime) {
+        this.updatedDateTime = updatedDateTime;
     }
 
-    public ZonedDateTime getDeleteDateTime() {
-        return deleteDateTime;
+    public ZonedDateTime getDeletedDateTime() {
+        return deletedDateTime;
     }
 
-    public void setDeleteDateTime(ZonedDateTime deleteDateTime) {
-        this.deleteDateTime = deleteDateTime;
+    public void setDeletedDateTime(ZonedDateTime deletedDateTime) {
+        this.deletedDateTime = deletedDateTime;
     }
 
     public UserEntity getUser() {
@@ -93,37 +105,38 @@ public class ReplyEntity {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        ReplyEntity that = (ReplyEntity) object;
-        return Objects.equals(replyId, that.replyId) && Objects.equals(body, that.body) && Objects.equals(createDateTime, that.createDateTime) && Objects.equals(updateDateTime, that.updateDateTime) && Objects.equals(deleteDateTime, that.deleteDateTime) && Objects.equals(user, that.user) && Objects.equals(post, that.post);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReplyEntity reply)) return false;
+        return Objects.equals(getReplyId(), reply.getReplyId())
+                && Objects.equals(getBody(), reply.getBody())
+                && Objects.equals(getCreatedDateTime(), reply.getCreatedDateTime())
+                && Objects.equals(getUpdatedDateTime(), reply.getUpdatedDateTime())
+                && Objects.equals(getDeletedDateTime(), reply.getDeletedDateTime())
+                && Objects.equals(getUser(), reply.getUser())
+                && Objects.equals(getPost(), reply.getPost());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(replyId, body, createDateTime, updateDateTime, deleteDateTime, user, post);
-    }
-
-    public static ReplyEntity of(String body, UserEntity user, PostEntity post){
-        var reply = new ReplyEntity();
-        reply.setBody(body);
-        reply.setUser(user);
-        reply.setPost(post);
-
-        return reply;
+        return Objects.hash(
+                getReplyId(),
+                getBody(),
+                getCreatedDateTime(),
+                getUpdatedDateTime(),
+                getDeletedDateTime(),
+                getUser(),
+                getPost());
     }
 
     @PrePersist
-    private void PrePersist(){
-        this.createDateTime = ZonedDateTime.now();
-        this.updateDateTime = ZonedDateTime.now();
+    private void prePersist() {
+        this.createdDateTime = ZonedDateTime.now();
+        this.updatedDateTime = this.createdDateTime;
     }
 
     @PreUpdate
-    private void preUpdate(){
-        this.updateDateTime = ZonedDateTime.now();
+    private void preUpdate() {
+        this.updatedDateTime = ZonedDateTime.now();
     }
-
-
 }

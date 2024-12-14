@@ -2,6 +2,7 @@ package com.comesfullcircle.board.model.user;
 
 import com.comesfullcircle.board.model.entity.UserEntity;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public record User(
@@ -9,22 +10,48 @@ public record User(
         String username,
         String profile,
         String description,
-        Long follwersCount,
+        Long followersCount,
         Long followingsCount,
         ZonedDateTime createdDateTime,
-        ZonedDateTime updatedDateTime
-) {
+        ZonedDateTime updatedDateTime,
+        Boolean isFollowing) {
 
-    public static User from(UserEntity userEntity) {
+    public static User from(UserEntity user) {
         return new User(
-                userEntity.getUserId(),
-                userEntity.getUsername(),
-                userEntity.getProfile(),
-                userEntity.getDescrption(),
-                userEntity.getFollwersCount(),
-                userEntity.getFollwingsCount(),
-                userEntity.getCreatedDateTime(),
-                userEntity.getUpdatedDateTime()
-        );
+                user.getUserId(),
+                user.getUsername(),
+                user.getProfile(),
+                user.getDescription(),
+                user.getFollowersCount(),
+                user.getFollowingsCount(),
+                user.getCreatedDateTime(),
+                user.getUpdatedDateTime(),
+                null);
+    }
+
+    public static User from(UserEntity user, Boolean isFollowing) {
+        return new User(
+                user.getUserId(),
+                user.getUsername(),
+                user.getProfile(),
+                user.getDescription(),
+                user.getFollowersCount(),
+                user.getFollowingsCount(),
+                user.getCreatedDateTime(),
+                user.getUpdatedDateTime(),
+                isFollowing);
+    }
+
+    public static User from(UserWithFollowingStatusProjection projection) {
+        return new User(
+                projection.getUserId(),
+                projection.getUsername(),
+                projection.getProfile(),
+                projection.getDescription(),
+                projection.getFollowersCount(),
+                projection.getFollowingsCount(),
+                projection.getCreatedDateTime().atZone(ZoneId.systemDefault()),
+                projection.getUpdatedDateTime().atZone(ZoneId.systemDefault()),
+                projection.getIsFollowing());
     }
 }

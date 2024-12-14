@@ -25,74 +25,77 @@ import java.util.List;
 
 @Service
 public class ReplyService {
-    @Autowired private ReplyEntityRepository replyEntityRepository;
+
     @Autowired private PostEntityRepository postEntityRepository;
     @Autowired private UserEntityRepository userEntityRepository;
 
-    public List<Reply> getRepliesByPostId(Long postId){
+    @Autowired private ReplyEntityRepository replyEntityRepository;
 
-        var postEntity = postEntityRepository.findById(postId)
-                .orElseThrow(
-                        ()-> new PostNotFoundException(postId)
-                );
-
+    public List<Reply> getRepliesByPostId(Long postId) {
+        var postEntity =
+                postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
         var replyEntities = replyEntityRepository.findByPost(postEntity);
+        return replyEntities.stream().map(Reply::from).toList();
+    }
+
+    public List<Reply> getRepliesByUser(String username) {
+        var user =
+                userEntityRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+        var replyEntities = replyEntityRepository.findByUser(user);
 
         return replyEntities.stream().map(Reply::from).toList();
     }
 
     @Transactional
-    public Reply createReply(Long postId, ReplyPostRequestBody replyPostRequestBody, UserEntity currentUser) {
-        var postEntity = postEntityRepository.findById(postId)
-                .orElseThrow(
-                        ()-> new PostNotFoundException(postId)
-                );
+    public Reply createReply(
+            Long postId, ReplyPostRequestBody replyPostRequestBody, UserEntity currentUser) {
+        var postEntity =
+                postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
-        var replyEntity = replyEntityRepository.save(
-                ReplyEntity.of(replyPostRequestBody.body(), currentUser, postEntity)
-        );
+        ReplyEntity replyEntity =
+                replyEntityRepository.save(
+                        ReplyEntity.of(replyPostRequestBody.body(), currentUser, postEntity));
 
         postEntity.setRepliesCount(postEntity.getRepliesCount() + 1);
+
         return Reply.from(replyEntity);
     }
 
-    public Reply updateReply(Long postId, Long replyId, ReplyPatchRequestBody replyPatchRequestBody, UserEntity currentUser) {
+    public Reply updateReply(
+            Long postId,
+            Long replyId,
+            ReplyPatchRequestBody replyPatchRequestBody,
+            UserEntity currentUser) {
+        postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+        var replyEntity =
+                replyEntityRepository
+                        .findById(replyId)
+                        .orElseThrow(() -> new ReplyNotFoundException(replyId));
 
-        postEntityRepository.findById(postId)
-                .orElseThrow(
-                        ()-> new PostNotFoundException(postId)
-                );
-        var replyEntity = replyEntityRepository.findById(replyId)
-                .orElseThrow(
-                        ()-> new ReplyNotFoundException(replyId)
-                );
-        if(!replyEntity.getUser().equals(currentUser)){
+        if (!replyEntity.getUser().equals(currentUser)) {
             throw new UserNotAllowedException();
         }
+
         replyEntity.setBody(replyPatchRequestBody.body());
-        var updatedReplyEntity = replyEntityRepository.save(replyEntity);
-        return Reply.from(updatedReplyEntity);
+        return Reply.from(replyEntityRepository.save(replyEntity));
     }
 
     @Transactional
     public void deleteReply(Long postId, Long replyId, UserEntity currentUser) {
-        var postEntity = postEntityRepository.findById(postId)
-                .orElseThrow(
-                        ()-> new PostNotFoundException(postId)
-                );
-        var replyEntity = replyEntityRepository.findById(replyId)
-                .orElseThrow(
-                        ()-> new ReplyNotFoundException(replyId)
-                );
-        if(!replyEntity.getUser().equals(currentUser)){
+        PostEntity postEntity =
+                postEntityRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+        var replyEntity =
+                replyEntityRepository
+                        .findById(replyId)
+                        .orElseThrow(() -> new ReplyNotFoundException(replyId));
+
+        if (!replyEntity.getUser().equals(currentUser)) {
             throw new UserNotAllowedException();
         }
-        replyEntityRepository.delete(replyEntity);
 
+        replyEntityRepository.delete(replyEntity);
         postEntity.setRepliesCount(Math.max(0, postEntity.getRepliesCount() - 1));
         postEntityRepository.save(postEntity);
-
     }
-
-
 }

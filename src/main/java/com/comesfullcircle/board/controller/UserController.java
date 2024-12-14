@@ -2,8 +2,10 @@ package com.comesfullcircle.board.controller;
 
 import com.comesfullcircle.board.model.entity.UserEntity;
 import com.comesfullcircle.board.model.post.Post;
+import com.comesfullcircle.board.model.reply.Reply;
 import com.comesfullcircle.board.model.user.*;
 import com.comesfullcircle.board.service.PostService;
+import com.comesfullcircle.board.service.ReplyService;
 import com.comesfullcircle.board.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,81 +20,96 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
+    @Autowired UserService userService;
+    @Autowired PostService postService;
     @Autowired
-    UserService userService;
-    @Autowired
-    private PostService postService;
+    ReplyService replyService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getUsers(@RequestParam(required = false) String query){
-        var users = userService.getUsers(query);
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<User>> getUsers(
+            @RequestParam(required = false) String query, Authentication authentication) {
+        var user = userService.getUsers(query, (UserEntity) authentication.getPrincipal());
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<User> getUser(@PathVariable String username){
-        var user = userService.getUser(username);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<User> getUser(
+            @PathVariable String username, Authentication authentication) {
+        var user = userService.getUser(username, (UserEntity) authentication.getPrincipal());
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/posts")
+    public ResponseEntity<List<Post>> getPostsByUser(
+            @PathVariable String username, Authentication authentication) {
+        var posts =
+                postService.getPostsByUsername(username, (UserEntity) authentication.getPrincipal());
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/replies")
+    public ResponseEntity<List<Reply>> getRepliesByUser(@PathVariable String username) {
+        var replies = replyService.getRepliesByUser(username);
+        return new ResponseEntity<>(replies, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/liked-users")
+    public ResponseEntity<List<LikedUser>> getLikedUsersByUser(
+            @PathVariable String username, Authentication authentication) {
+        var likedUsers =
+                userService.getLikedUsersByUser(username, (UserEntity) authentication.getPrincipal());
+        return new ResponseEntity<>(likedUsers, HttpStatus.OK);
     }
 
     @PatchMapping("/{username}")
     public ResponseEntity<User> updateUser(
             @PathVariable String username,
             @RequestBody UserPatchRequestBody requestBody,
-            Authentication authentication){
+            Authentication authentication) {
         var user =
                 userService.updateUser(username, requestBody, (UserEntity) authentication.getPrincipal());
-        return ResponseEntity.ok(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
-
-    //GET /users/{username}/posts
-    @GetMapping("/{username}/posts")
-    public ResponseEntity<List<Post>> getPostByUsername(@PathVariable String username){
-        var posts = postService.getPostsByUsername(username);
-        return ResponseEntity.ok(posts);
-    }
-
 
     @GetMapping("/{username}/followers")
-    public ResponseEntity<List<User>> getFollowersByUser(@PathVariable String username, Authentication authentication){
-        var followers = userService.getFollowersByUsername(username);
-        return ResponseEntity.ok(followers);
+    public ResponseEntity<List<Follower>> getFollowersByUser(
+            @PathVariable String username, Authentication authentication) {
+        var followers =
+                userService.getFollowersByUsername(username, (UserEntity) authentication.getPrincipal());
+        return new ResponseEntity<>(followers, HttpStatus.OK);
     }
 
     @GetMapping("/{username}/followings")
-    public ResponseEntity<List<User>> getFollowingsByUser(@PathVariable String username, Authentication authentication) {
-        var followings = userService.getFollowingsByUsername(username);
-        return ResponseEntity.ok(followings);
-    }
-
-    @DeleteMapping("/{username}/unfollows")
-    public ResponseEntity<User> unfollow(@PathVariable String username, Authentication authentication){
-        var user = userService.follow(username, (UserEntity) authentication.getPrincipal());
-        return ResponseEntity.ok(user);
+    public ResponseEntity<List<User>> getFollowingsByUser(
+            @PathVariable String username, Authentication authentication) {
+        var followings =
+                userService.getFollowingsByUsername(username, (UserEntity) authentication.getPrincipal());
+        return new ResponseEntity<>(followings, HttpStatus.OK);
     }
 
     @PostMapping("/{username}/follows")
-    public ResponseEntity<User> follow(@PathVariable String username, Authentication authentication){
+    public ResponseEntity<User> follow(@PathVariable String username, Authentication authentication) {
         var user = userService.follow(username, (UserEntity) authentication.getPrincipal());
-        return ResponseEntity.ok(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{username}/follows")
+    public ResponseEntity<User> unfollow(
+            @PathVariable String username, Authentication authentication) {
+        var user = userService.unFollow(username, (UserEntity) authentication.getPrincipal());
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<User> signUp(@Valid @RequestBody UserSignUpRequestBody userSignUpRequestBody){
-        var user = userService.signUp(
-                userSignUpRequestBody.username(),
-                userSignUpRequestBody.password()
-        );
-       return ResponseEntity.ok(user);
-   //     return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<User> signUp(@Valid @RequestBody UserSignUpRequestBody requestBody) {
+        var user = userService.signUp(requestBody.username(), requestBody.password());
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<UserAuthenticationResponse> authenticate(@Valid @RequestBody UserLoginRequestBody userLoginRequestBody){
-        var response = userService.authenticate(
-                userLoginRequestBody.username(),
-                userLoginRequestBody.password()
-        );
-        return ResponseEntity.ok(response);
+    public ResponseEntity<UserAuthenticationResponse> authenticate(
+            @Valid @RequestBody UserLoginRequestBody requestBody) {
+        var response = userService.login(requestBody.username(), requestBody.password());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

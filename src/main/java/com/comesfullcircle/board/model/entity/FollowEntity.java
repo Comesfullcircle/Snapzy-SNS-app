@@ -8,17 +8,13 @@ import java.util.Objects;
 
 @Entity
 @Table(
-        name = "\"follow\"",
-        indexes = {@Index(
-                name = "follow_follower_following_idx",
-                columnList ="follower, following",
-                unique = true )})
+        name = "follow",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"follower", "following"})})
 public class FollowEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long followId;
-    @Column
-    private ZonedDateTime createDateTime;
+
     @ManyToOne
     @JoinColumn(name = "follower")
     private UserEntity follower;
@@ -27,12 +23,15 @@ public class FollowEntity {
     @JoinColumn(name = "following")
     private UserEntity following;
 
-    public ZonedDateTime getCreateDateTime() {
-        return createDateTime;
-    }
+    @Column private ZonedDateTime createdDateTime;
 
-    public void setCreateDateTime(ZonedDateTime createDateTime) {
-        this.createDateTime = createDateTime;
+    public FollowEntity() {}
+
+    public static FollowEntity of(UserEntity follower, UserEntity following) {
+        FollowEntity follow = new FollowEntity();
+        follow.setFollower(follower);
+        follow.setFollowing(following);
+        return follow;
     }
 
     public Long getFollowId() {
@@ -59,30 +58,31 @@ public class FollowEntity {
         this.following = following;
     }
 
+    public ZonedDateTime getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(ZonedDateTime createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        FollowEntity that = (FollowEntity) object;
-        return Objects.equals(followId, that.followId) && Objects.equals(createDateTime, that.createDateTime) && Objects.equals(follower, that.follower) && Objects.equals(following, that.following);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FollowEntity that)) return false;
+        return Objects.equals(getFollowId(), that.getFollowId())
+                && Objects.equals(getFollower(), that.getFollower())
+                && Objects.equals(getFollowing(), that.getFollowing())
+                && Objects.equals(getCreatedDateTime(), that.getCreatedDateTime());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(followId, createDateTime, follower, following);
-    }
-
-    public static FollowEntity of(UserEntity follower, UserEntity following){
-        var follow = new FollowEntity();
-        follow.setFollower(follower);
-        follow.setFollowing(following);
-
-        return follow;
+        return Objects.hash(getFollowId(), getFollower(), getFollowing(), getCreatedDateTime());
     }
 
     @PrePersist
-    private void PrePersist(){
-        this.createDateTime = ZonedDateTime.now();
+    private void prePersist() {
+        this.createdDateTime = ZonedDateTime.now();
     }
-
 }

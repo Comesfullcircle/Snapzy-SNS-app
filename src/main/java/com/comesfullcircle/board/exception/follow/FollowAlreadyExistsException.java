@@ -4,19 +4,20 @@ import com.comesfullcircle.board.exception.ClientErrorException;
 import com.comesfullcircle.board.model.entity.UserEntity;
 import org.springframework.http.HttpStatus;
 
-public class FollowNotFoundException extends ClientErrorException {
 
-    public FollowNotFoundException() {
-        super(HttpStatus.NOT_FOUND, "Follow not found.");
+public class FollowAlreadyExistsException extends ClientErrorException {
+
+    public FollowAlreadyExistsException() {
+        super(HttpStatus.CONFLICT, "Follow already exists.");
     }
 
-    public FollowNotFoundException(UserEntity follower, UserEntity following) {
+    public FollowAlreadyExistsException(UserEntity follower, UserEntity following) {
         super(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.CONFLICT,
                 "Follow with follower "
                         + follower.getUsername()
                         + " and following "
                         + following.getUsername()
-                        + " not found.");
+                        + " already exists.");
     }
 }

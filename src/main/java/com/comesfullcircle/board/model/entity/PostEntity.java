@@ -13,10 +13,10 @@ import java.util.Objects;
 @Entity
 @Table(
         name = "post",
-        indexes = {@Index(name = "post_userid_idx", columnList = "userId")})
+        indexes = {@Index(name = "post_userid_idx", columnList = "userid")})
 @SQLDelete(sql = "UPDATE \"post\" SET deleteddatetime = CURRENT_TIMESTAMP WHERE postid = ?")
-//Deperecated in Hibernate 6.3
-//@Where(clause = "deletedDateTime IS NULL")
+// Deprecated in Hibernate 6.3
+// @Where(clause = "deletedDateTime IS NULL")
 @SQLRestriction("deleteddatetime IS NULL")
 public class PostEntity {
     @Id
@@ -30,18 +30,24 @@ public class PostEntity {
 
     @Column private Long likesCount = 0L;
 
-    @Column
-    private ZonedDateTime createdDateTime;
+    @Column private ZonedDateTime createdDateTime;
 
-    @Column
-    private ZonedDateTime updatedDateTime;
+    @Column private ZonedDateTime updatedDateTime;
 
-    @Column
-    private ZonedDateTime deletedDateTime;
+    @Column private ZonedDateTime deletedDateTime;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userid")
     private UserEntity user;
+
+    public PostEntity() {}
+
+    public static PostEntity of(String body, UserEntity user) {
+        PostEntity post = new PostEntity();
+        post.setBody(body);
+        post.setUser(user);
+        return post;
+    }
 
     public Long getPostId() {
         return postId;
@@ -107,35 +113,41 @@ public class PostEntity {
         this.user = user;
     }
 
-
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        PostEntity that = (PostEntity) object;
-        return Objects.equals(postId, that.postId) && Objects.equals(body, that.body) && Objects.equals(repliesCount, that.repliesCount) && Objects.equals(likesCount, that.likesCount) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime) && Objects.equals(user, that.user);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PostEntity that)) return false;
+        return Objects.equals(getPostId(), that.getPostId())
+                && Objects.equals(getBody(), that.getBody())
+                && Objects.equals(getRepliesCount(), that.getRepliesCount())
+                && Objects.equals(getLikesCount(), that.getLikesCount())
+                && Objects.equals(getCreatedDateTime(), that.getCreatedDateTime())
+                && Objects.equals(getUpdatedDateTime(), that.getUpdatedDateTime())
+                && Objects.equals(getDeletedDateTime(), that.getDeletedDateTime())
+                && Objects.equals(getUser(), that.getUser());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(postId, body, repliesCount, likesCount, createdDateTime, updatedDateTime, deletedDateTime, user);
-    }
-
-    public static PostEntity of(String body, UserEntity user) {
-        var post = new PostEntity();
-        post.setBody(body);
-        post.setUser(user);
-        return post;
+        return Objects.hash(
+                getPostId(),
+                getBody(),
+                getRepliesCount(),
+                getLikesCount(),
+                getCreatedDateTime(),
+                getUpdatedDateTime(),
+                getDeletedDateTime(),
+                getUser());
     }
 
     @PrePersist
-    public void prePersist() {
+    private void prePersist() {
         this.createdDateTime = ZonedDateTime.now();
         this.updatedDateTime = this.createdDateTime;
     }
 
     @PreUpdate
-    private  void preUpdate() {
+    private void preUpdate() {
         this.updatedDateTime = ZonedDateTime.now();
     }
 }

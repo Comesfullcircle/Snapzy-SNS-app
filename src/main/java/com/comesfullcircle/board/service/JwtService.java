@@ -9,52 +9,57 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
-import io.jsonwebtoken.Claims;
 
 
 @Service
 public class JwtService {
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    // 비밀 키 생성
-    private static final SecretKey key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+    //private static final SecretKey key = Jwts.SIG.HS256.key().build();
+    // 32바이트 이상의 시크릿 키 생성
+    private static final SecretKey key = Keys.hmacShaKeyFor("your-secure-secret-key-your-secure-secret-key".getBytes(StandardCharsets.UTF_8));
 
-    public String generateAccessToken(UserDetails userDetails) {
+    public String getUsername(String jwtToken) {
+        return getSubject(jwtToken);
+    }
+
+    public String generateToken(UserDetails userDetails) {
         return generateToken(userDetails.getUsername());
     }
 
-    public String getUsername(String accessToken){
-        return getSubject(accessToken);
-    }
-
-    // 토큰 생성
-    public String generateToken(String subject) {
+    private String generateToken(String subject) {
         var now = new Date();
-        var exp = new Date(now.getTime() + 1000 * 60 * 60 * 3); // 3시간 유효
-
+        var exp = new Date(now.getTime() + (1000 * 60 * 60 * 3));
+        //return Jwts.builder().subject(subject).signWith(key).issuedAt(now).expiration(exp).compact();
         return Jwts.builder()
-                .setSubject(subject) // 사용자 정보 설정
-                .setIssuedAt(now) // 발행 시간
-                .setExpiration(exp) // 만료 시간
-                .signWith(key) // 서명 설정
+                .setSubject(subject) // setSubject 사용
+                .signWith(key) // 서명 키 설정
+                .setIssuedAt(now) // 발행일
+                .setExpiration(exp) // 만료일
                 .compact();
     }
 
-    // 토큰에서 Subject 추출
-    public String getSubject(String token) {
+    private String getSubject(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
+          /*  return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();*/
+
+            return Jwts.parserBuilder()
                     .setSigningKey(key) // 서명 키 설정
                     .build()
-                    .parseClaimsJws(token) // 토큰 파싱
-                    .getBody();
+                    .parseClaimsJws(token) // JWT 토큰 파싱
+                    .getBody() // 클레임의 Body 가져오기
+                    .getSubject(); // Subject 추출
 
-            return claims.getSubject(); // Subject 반환
         } catch (JwtException e) {
-            logger.error("Invalid JWT token", e);
-            throw new IllegalArgumentException("Invalid token provided", e);
+            logger.error("JwtException", e);
+            throw e;
         }
     }
 }

@@ -7,27 +7,20 @@ spring:
       format_sql: true
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      properties:
-        hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-   # url: jdbc:postgresql://172.17.0.2:5432/board-db
     url: jdbc:postgresql://localhost:5432/board_db
     username: board-master
     password: 1234
   security:
-    user:
-      name: board-admin
-      password: 1234
-  loging:
-    level:
-      # TRACE < DEBUF < INDO < WARN < ERROR
-      root: INFO
+    user.name: board-admin
+    user.password: 1234
 
-      #  logging:
-      #    level:
-      #      org.hibernate.type: TRACE
-      #      org.hibernate.orm.jdbc.bind: TRACE
-      #      org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG
-      #      org.springframework.orm.jpa: DEBUG
-      #      org.springframework.transaction: DEBUG
-
+#logging:
+#  level:
+#    org.hibernate.type: TRACE
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG
+#    org.springframework.orm.jpa: DEBUG
+#    org.springframework.transaction: DEBUG
