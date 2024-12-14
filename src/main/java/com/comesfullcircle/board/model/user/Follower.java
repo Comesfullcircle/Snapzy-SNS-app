@@ -1,5 +1,6 @@
 package com.comesfullcircle.board.model.user;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public record Follower(

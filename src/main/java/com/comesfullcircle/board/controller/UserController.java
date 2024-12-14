@@ -2,8 +2,10 @@ package com.comesfullcircle.board.controller;
 
 import com.comesfullcircle.board.model.entity.UserEntity;
 import com.comesfullcircle.board.model.post.Post;
+import com.comesfullcircle.board.model.reply.Reply;
 import com.comesfullcircle.board.model.user.*;
 import com.comesfullcircle.board.service.PostService;
+import com.comesfullcircle.board.service.ReplyService;
 import com.comesfullcircle.board.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +22,8 @@ import java.util.List;
 public class UserController {
     @Autowired UserService userService;
     @Autowired PostService postService;
-
-    @Autowired ReplyService replyService;
+    @Autowired
+    ReplyService replyService;
 
     @GetMapping
     public ResponseEntity<List<User>> getUsers(

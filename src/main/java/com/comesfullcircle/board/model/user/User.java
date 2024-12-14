@@ -2,6 +2,7 @@ package com.comesfullcircle.board.model.user;
 
 import com.comesfullcircle.board.model.entity.UserEntity;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public record User(

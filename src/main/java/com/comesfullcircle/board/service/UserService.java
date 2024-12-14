@@ -1,10 +1,9 @@
 package com.comesfullcircle.board.service;
 
-import com.comesfullcircle.board.exception.follow.FollowAlreadyExistException;
 import com.comesfullcircle.board.exception.follow.FollowAlreadyExistsException;
 import com.comesfullcircle.board.exception.follow.FollowNotFoundException;
 import com.comesfullcircle.board.exception.follow.InvalidFollowException;
-import com.comesfullcircle.board.exception.user.UserAlreadyExistException;
+import com.comesfullcircle.board.exception.post.PostNotFoundException;
 import com.comesfullcircle.board.exception.user.UserAlreadyExistsException;
 import com.comesfullcircle.board.exception.user.UserNotAllowedException;
 import com.comesfullcircle.board.exception.user.UserNotFoundException;
