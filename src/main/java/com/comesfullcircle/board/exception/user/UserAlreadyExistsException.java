@@ -3,13 +3,13 @@ package com.comesfullcircle.board.exception.user;
 import com.comesfullcircle.board.exception.ClientErrorException;
 import org.springframework.http.HttpStatus;
 
-public class UserAlreadyExistException extends ClientErrorException {
+public class UserAlreadyExistsException extends ClientErrorException {
 
-    public UserAlreadyExistException() {
+    public UserAlreadyExistsException() {
         super(HttpStatus.CONFLICT, "User already exists.");
     }
 
-    public UserAlreadyExistException(String username) {
+    public UserAlreadyExistsException(String username) {
         super(HttpStatus.CONFLICT, "User with username " + username + " already exists.");
     }
 }

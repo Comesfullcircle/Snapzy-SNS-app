@@ -12,43 +12,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ClientErrorException.class)
-    public ResponseEntity<ClientErrorResponse> handleClientException(ClientErrorException e) {
+    public ResponseEntity<ClientErrorResponse> handleClientErrorException(ClientErrorException e) {
         return new ResponseEntity<>(
-                new ClientErrorResponse(e.getStatus(), e.getMessage()), e.getStatus()
-        );
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ClientErrorResponse> handleClientException(MethodArgumentNotValidException e) {
-
-        String errorMessage = e.getFieldErrors()
-                .stream()
-                .map(fieldError -> (fieldError.getField() + ": " + fieldError.getDefaultMessage()))
-                .toList()
-                .toString();
-
-        return new ResponseEntity<>(
-                new ClientErrorResponse(HttpStatus.BAD_REQUEST, errorMessage), HttpStatus.BAD_REQUEST
-        );
+                new ClientErrorResponse(e.getStatus(), e.getMessage()), e.getStatus());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ClientErrorResponse> handleClientException(HttpMessageNotReadableException e) {
+    public ResponseEntity<ClientErrorResponse> handleClientErrorException(
+            HttpMessageNotReadableException e) {
         return new ResponseEntity<>(
-                new ClientErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()), HttpStatus.BAD_REQUEST
-        );
+                new ClientErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ClientErrorResponse> handleClientException(RuntimeException e) {
-        return ResponseEntity.internalServerError().build();
-    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ClientErrorResponse> handleClientErrorException(
+            MethodArgumentNotValidException e) {
+        var errorMessage =
+                e.getFieldErrors().stream()
+                        .map(fieldError -> (fieldError.getField() + ": " + fieldError.getDefaultMessage()))
+                        .toList()
+                        .toString();
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ClientErrorResponse> handleClientException(Exception e) {
-        return ResponseEntity.internalServerError().build();
+        return new ResponseEntity<>(
+                new ClientErrorResponse(HttpStatus.BAD_REQUEST, errorMessage), HttpStatus.BAD_REQUEST);
     }
-
 }

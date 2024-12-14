@@ -16,18 +16,15 @@ public record Reply(
         Post post,
         ZonedDateTime createdDateTime,
         ZonedDateTime updatedDateTime,
-        ZonedDateTime deletedDateTime
-){
-    public static Reply from(ReplyEntity replyEntity){
+        ZonedDateTime deletedDateTime) {
+    public static Reply from(ReplyEntity replyEntity) {
         return new Reply(
                 replyEntity.getReplyId(),
                 replyEntity.getBody(),
                 User.from(replyEntity.getUser()),
                 Post.from(replyEntity.getPost()),
-                replyEntity.getCreateDateTime(),
-                replyEntity.getUpdateDateTime(),
-                replyEntity.getDeleteDateTime()
-        );
+                replyEntity.getCreatedDateTime(),
+                replyEntity.getUpdatedDateTime(),
+                replyEntity.getDeletedDateTime());
     }
-
 }

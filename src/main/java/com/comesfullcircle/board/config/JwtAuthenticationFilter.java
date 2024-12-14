@@ -22,41 +22,34 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired private UserService userService;
-    @Autowired private JwtService jwtService;
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
 
-        // 특정 경로는 JWT 인증을 적용하지 않음
-        String path = request.getRequestURI();
-        if ("/api/v1/users".equals(path) || "/api/v1/users/authenticate".equals(path)) {
-            if (HttpMethod.POST.matches(request.getMethod())) {
-                filterChain.doFilter(request, response);
-                return; // 이 경로에 대해선 JWT 인증을 하지 않음
-            }
-        }
+    @Autowired private JwtService jwtService;
+    @Autowired private UserService userService;
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         String BEARER_PREFIX = "Bearer ";
         var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         var securityContext = SecurityContextHolder.getContext();
-        if(ObjectUtils.isEmpty(authorization)|| !authorization.startsWith(BEARER_PREFIX)){
-            throw new JwtTokenNotFoundException();
-        }
-        if (!ObjectUtils.isEmpty(authorization) && authorization.startsWith(BEARER_PREFIX)
-                && securityContext.getAuthentication() == null){
-            var accessToken = authorization.substring(BEARER_PREFIX.length());
-            var username = jwtService.getUsername(accessToken);
+
+        if (!ObjectUtils.isEmpty(authorization)
+                && authorization.startsWith(BEARER_PREFIX)
+                && securityContext.getAuthentication() == null) {
+            var jwtToken = authorization.substring(BEARER_PREFIX.length());
+            var username = jwtService.getUsername(jwtToken);
             var userDetails = userService.loadUserByUsername(username);
 
-            var authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            securityContext.setAuthentication(authenticationToken);
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            usernamePasswordAuthenticationToken.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request));
+            securityContext.setAuthentication(usernamePasswordAuthenticationToken);
             SecurityContextHolder.setContext(securityContext);
         }
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }

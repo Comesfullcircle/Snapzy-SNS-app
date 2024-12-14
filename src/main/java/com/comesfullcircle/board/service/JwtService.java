@@ -13,48 +13,37 @@ import java.util.Date;
 
 import io.jsonwebtoken.Claims;
 
-
 @Service
 public class JwtService {
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    // 비밀 키 생성
-    private static final SecretKey key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+    private static final SecretKey key = Jwts.SIG.HS256.key().build();
 
-    public String generateAccessToken(UserDetails userDetails) {
+    public String getUsername(String jwtToken) {
+        return getSubject(jwtToken);
+    }
+
+    public String generateToken(UserDetails userDetails) {
         return generateToken(userDetails.getUsername());
     }
 
-    public String getUsername(String accessToken){
-        return getSubject(accessToken);
-    }
-
-    // 토큰 생성
-    public String generateToken(String subject) {
+    private String generateToken(String subject) {
         var now = new Date();
-        var exp = new Date(now.getTime() + 1000 * 60 * 60 * 3); // 3시간 유효
-
-        return Jwts.builder()
-                .setSubject(subject) // 사용자 정보 설정
-                .setIssuedAt(now) // 발행 시간
-                .setExpiration(exp) // 만료 시간
-                .signWith(key) // 서명 설정
-                .compact();
+        var exp = new Date(now.getTime() + (1000 * 60 * 60 * 3));
+        return Jwts.builder().subject(subject).signWith(key).issuedAt(now).expiration(exp).compact();
     }
 
-    // 토큰에서 Subject 추출
-    public String getSubject(String token) {
+    private String getSubject(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key) // 서명 키 설정
+            return Jwts.parser()
+                    .verifyWith(key)
                     .build()
-                    .parseClaimsJws(token) // 토큰 파싱
-                    .getBody();
-
-            return claims.getSubject(); // Subject 반환
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
         } catch (JwtException e) {
-            logger.error("Invalid JWT token", e);
-            throw new IllegalArgumentException("Invalid token provided", e);
+            logger.error("JwtException", e);
+            throw e;
         }
     }
 }

@@ -10,13 +10,12 @@ import java.util.Objects;
 @Entity
 @Table(
         name = "\"like\"",
-        indexes = {@Index(name = "like_userid_postid_idx", columnList ="userid, postid", unique = true )})
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"userid", "postid"})})
 public class LikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long likeId;
-    @Column
-    private ZonedDateTime createDateTime;
+
     @ManyToOne
     @JoinColumn(name = "userid")
     private UserEntity user;
@@ -25,20 +24,23 @@ public class LikeEntity {
     @JoinColumn(name = "postid")
     private PostEntity post;
 
+    @Column private ZonedDateTime createdDateTime;
+
+    public LikeEntity() {}
+
+    public static LikeEntity of(UserEntity user, PostEntity post) {
+        LikeEntity like = new LikeEntity();
+        like.setUser(user);
+        like.setPost(post);
+        return like;
+    }
+
     public Long getLikeId() {
         return likeId;
     }
 
     public void setLikeId(Long likeId) {
         this.likeId = likeId;
-    }
-
-    public ZonedDateTime getCreateDateTime() {
-        return createDateTime;
-    }
-
-    public void setCreateDateTime(ZonedDateTime createDateTime) {
-        this.createDateTime = createDateTime;
     }
 
     public UserEntity getUser() {
@@ -57,30 +59,31 @@ public class LikeEntity {
         this.post = post;
     }
 
+    public ZonedDateTime getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(ZonedDateTime createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        LikeEntity that = (LikeEntity) object;
-        return Objects.equals(likeId, that.likeId) && Objects.equals(createDateTime, that.createDateTime) && Objects.equals(user, that.user) && Objects.equals(post, that.post);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LikeEntity that)) return false;
+        return Objects.equals(getLikeId(), that.getLikeId())
+                && Objects.equals(getUser(), that.getUser())
+                && Objects.equals(getPost(), that.getPost())
+                && Objects.equals(getCreatedDateTime(), that.getCreatedDateTime());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(likeId, createDateTime, user, post);
-    }
-
-    public static LikeEntity of( UserEntity user, PostEntity post){
-        var like = new LikeEntity();
-        like.setUser(user);
-        like.setPost(post);
-
-        return like;
+        return Objects.hash(getLikeId(), getUser(), getPost(), getCreatedDateTime());
     }
 
     @PrePersist
-    private void PrePersist(){
-        this.createDateTime = ZonedDateTime.now();
+    private void prePersist() {
+        this.createdDateTime = ZonedDateTime.now();
     }
-
 }
